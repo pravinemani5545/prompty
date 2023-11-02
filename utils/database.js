@@ -11,7 +11,7 @@ export const connectToDB = async () => {
   }
 
   try {
-    await mongoose.connect("mongodb+srv://pravinemani:6OL0AzqLw0J1Ea1z@cluster0.jfddoh7.mongodb.net/promptopia?retryWrites=true&w=majority", {
+    await mongoose.connect("mongodb+srv://pravinemani:NyyFMYw8zErLOwz6@cluster0.jfddoh7.mongodb.net/promptopia?retryWrites=true&w=majority", {
       dbName: "Promptopia",
       useNewUrlParser: true,
       useUnifiedTopology: true,
