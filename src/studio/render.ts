@@ -105,7 +105,11 @@ export async function renderShort(input: ShortInput, options: RenderOptions): Pr
   };
 
   // 2. Serve the render page locally and drive it frame by frame.
-  const mounts = { webDir: path.join(options.rootDir, "web"), assetsDir: path.join(options.rootDir, "assets") };
+  const mounts = {
+    webDir: path.join(options.rootDir, "web"),
+    assetsDir: path.join(options.rootDir, "assets"),
+    modulesDir: path.join(options.rootDir, "node_modules"),
+  };
   const server = http.createServer((req, res) => {
     if (!serveStatic(req, res, mounts)) {
       res.writeHead(404);
@@ -116,7 +120,11 @@ export async function renderShort(input: ShortInput, options: RenderOptions): Pr
   const address = server.address();
   const port = typeof address === "object" && address ? address.port : 0;
 
-  const browser = await chromium.launch(options.chromiumPath ? { executablePath: options.chromiumPath } : {});
+  const browser = await chromium.launch({
+    // Live2D avatars draw with WebGL; this keeps it working on machines without a usable GPU.
+    args: ["--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"],
+    ...(options.chromiumPath ? { executablePath: options.chromiumPath } : {}),
+  });
   let ffmpeg: ReturnType<typeof spawn> | undefined;
   try {
     const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });

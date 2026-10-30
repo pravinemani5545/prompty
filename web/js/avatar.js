@@ -390,9 +390,17 @@ export class PngAvatar {
   }
 }
 
-export function createAvatar(container, avatarConfig, options) {
+/** Builds the avatar a character asks for. Async because Live2D models load over the network. */
+export async function createAvatar(container, avatarConfig, options) {
+  if (avatarConfig.type === "live2d") {
+    const { createLive2DAvatar } = await import("./live2d.js");
+    return createLive2DAvatar(container, avatarConfig, options);
+  }
   return avatarConfig.type === "png" ? new PngAvatar(container, avatarConfig, options) : new ToasterAvatar(container, avatarConfig, options);
 }
+
+/** Crumb's look, used to keep the show running if the configured avatar fails to load. */
+export const FALLBACK_AVATAR = { type: "toaster", label: "", bodyColor: "#8FE3CF", accentColor: "#7CF7FF", screenColor: "#141A33" };
 
 /** Finds a toast rating in a line ("Rated: Burnt") so the avatar can show it. */
 export function findRating(text) {

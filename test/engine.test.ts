@@ -49,6 +49,16 @@ describe("engine server", () => {
     assert.equal(character.avatar.type, "toaster");
   });
 
+  test("serves only allow-listed browser builds from node_modules", async () => {
+    const pixi = await fetch(`${base}/vendor/pixi.min.js`);
+    assert.equal(pixi.status, 200);
+    assert.match(pixi.headers.get("content-type") ?? "", /javascript/);
+    assert.equal((await fetch(`${base}/vendor/live2d-cubism4.min.js`)).status, 200);
+    for (const path of ["/vendor/ws/package.json", "/vendor/..%2fpackage.json", "/vendor/obscenity/dist/index.js"]) {
+      assert.equal((await rawGet(path)).status, 404, path);
+    }
+  });
+
   test("refuses path traversal", async () => {
     for (const path of ["/web/..%2fpackage.json", "/web/%2e%2e/%2e%2e/package.json", `/media/${engine.session.id}/..%2f..%2fmemory.json`, "/assets/..%2fpackage.json"]) {
       const res = await rawGet(path);

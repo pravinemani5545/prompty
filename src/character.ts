@@ -16,6 +16,21 @@ export type AvatarConfig =
       basePath: string;
       /** Per-emotion images. `neutral` is required; other emotions fall back to it. */
       states: Record<string, { closed: string; open?: string; blink?: string }>;
+    }
+  | {
+      type: "live2d";
+      /** URL path to the .model3.json, e.g. /assets/live2d/hiyori/Hiyori.model3.json */
+      model: string;
+      /** URL path to live2dcubismcore.min.js. */
+      core: string;
+      /** 1 fits the whole model in frame; higher zooms in (2 is roughly head to waist). */
+      zoom: number;
+      /** Which point of the model, top (0) to bottom (1), sits in the middle of the frame. */
+      focusY: number;
+      /** The parameter that opens the mouth. ParamMouthOpenY on most models. */
+      lipSyncParam: string;
+      /** Optional emotion -> expression name, for models that ship expressions (exp3). */
+      expressions: Record<string, string>;
     };
 
 export interface Character {
@@ -106,7 +121,32 @@ function parseAvatar(raw: Raw, name: string): AvatarConfig {
     if (!parsed.neutral) throw new Error('character: png avatars need at least a "neutral" state');
     return { type, basePath: basePath.replace(/\/+$/, ""), states: parsed };
   }
-  throw new Error(`character: avatar.type must be "toaster" or "png" (got "${type}")`);
+  if (type === "live2d") {
+    const model = asString(raw, "model", true);
+    if (!model.endsWith(".model3.json")) throw new Error("character: avatar.model must point at a .model3.json file");
+    const number = (key: string, fallback: number, min: number, max: number) => {
+      const value = raw[key] === undefined ? fallback : Number(raw[key]);
+      if (!Number.isFinite(value) || value < min || value > max) throw new Error(`character: avatar.${key} must be a number from ${min} to ${max}`);
+      return value;
+    };
+    const expressions: Record<string, string> = {};
+    for (const [emotion, name] of Object.entries(asObject(raw, "expressions"))) {
+      if (!(EMOTIONS as readonly string[]).includes(emotion) || typeof name !== "string") {
+        throw new Error(`character: avatar.expressions maps emotions (${EMOTIONS.join(", ")}) to expression names`);
+      }
+      expressions[emotion] = name;
+    }
+    return {
+      type,
+      model,
+      core: asString(raw, "core") ?? "/assets/live2d/live2dcubismcore.min.js",
+      zoom: number("zoom", 1.9, 0.2, 6),
+      focusY: number("focusY", 0.33, 0, 1),
+      lipSyncParam: asString(raw, "lipSyncParam") ?? "ParamMouthOpenY",
+      expressions,
+    };
+  }
+  throw new Error(`character: avatar.type must be "live2d", "png" or "toaster" (got "${type}")`);
 }
 
 export function parseCharacter(source: string): Character {

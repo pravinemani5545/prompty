@@ -12,7 +12,7 @@ let segments = [];
 let lastFrame = -1;
 let captionKey = "";
 
-function setup(s) {
+async function setup(s) {
   spec = s;
   lastFrame = -1;
   captionKey = "";
@@ -28,7 +28,10 @@ function setup(s) {
   $("end-1").textContent = s.endCard.line1;
   $("end-2").textContent = s.endCard.line2;
   $("end-3").textContent = s.endCard.line3;
-  avatar = createAvatar($("stage"), s.character.avatar, { seed: 11 });
+  // Live2D models get a taller stage that runs to the bottom edge, behind the captions.
+  $("stage").classList.toggle("live2d", s.character.avatar.type === "live2d");
+  // manual: the avatar only advances (and Live2D only draws) when frame() asks it to.
+  avatar = await createAvatar($("stage"), s.character.avatar, { seed: 11, manual: true });
   segments = s.segments.map((seg) => {
     const words = wordTimings(seg.text, seg.duration);
     return { ...seg, words, chunks: chunkWords(words), rating: findRating(seg.text), popped: false, ratingShown: false };

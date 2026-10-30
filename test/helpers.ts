@@ -13,9 +13,16 @@ export function crumb(): Character {
   return loadCharacter(path.join(ROOT_DIR, "characters", "crumb.yaml"));
 }
 
-/** A config that never touches real services: mock brain, babble voice, temp data dir, random port. */
+/** A config that never touches real services: mock brain, babble voice, temp data dir, random port, Crumb (no downloads needed). */
 export function testConfig(overrides: Record<string, string> = {}): Config {
-  return loadConfig({ BRAIN: "mock", TTS_PROVIDER: "babble", PORT: "0", DATA_DIR: tempDir(), ...overrides });
+  return loadConfig({
+    BRAIN: "mock",
+    TTS_PROVIDER: "babble",
+    PORT: "0",
+    DATA_DIR: tempDir(),
+    CHARACTER_FILE: path.join(ROOT_DIR, "characters", "crumb.yaml"),
+    ...overrides,
+  });
 }
 
 let n = 0;

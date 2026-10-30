@@ -3,18 +3,19 @@ import { messageId, type ChatSource, type SourceState } from "./source.js";
 
 const USERS = ["breadwinner_99", "pixelpanda", "CodeGoblin", "sourdough_sam", "NightOwlDev", "toastmaster_flex", "lofi_luna", "rustacean_rex"];
 
+// {name} is replaced with the character's name.
 const LINES = [
-  "Crumb roast my setup, I have three monitors and one chair leg",
+  "{name} roast my setup, I have three monitors and one chair leg",
   "what do you think of tabs vs spaces?",
-  "hi crumb!! first time here",
-  "rate my startup idea: uber for toasters",
-  "crumb are you smarter than the microwave?",
+  "hi {name}!! first time here",
+  "rate my startup idea: uber for houseplants",
+  "{name} are you smarter than a smart speaker?",
   "my code compiled on the first try, rate that",
-  "what's your favorite bread",
+  "what's your favorite snack",
   "roast my 47 open chrome tabs",
-  "is it true you've never toasted bread?",
+  "{name} judge my desk setup pls",
   "LETS GOOO",
-  "crumb what is your firmware version now?",
+  "{name} what did you learn today?",
   "rate my hot take: dark mode is overrated",
 ];
 
@@ -25,7 +26,9 @@ export class DemoChat implements ChatSource {
   private timer: NodeJS.Timeout | undefined;
   private sent = 0;
 
-  constructor(private readonly options: { minDelayMs?: number; maxDelayMs?: number; random?: () => number } = {}) {}
+  constructor(
+    private readonly options: { characterName?: string; minDelayMs?: number; maxDelayMs?: number; random?: () => number } = {},
+  ) {}
 
   get state(): SourceState {
     return this.currentState;
@@ -43,7 +46,7 @@ export class DemoChat implements ChatSource {
         id: messageId("demo"),
         platform: "demo",
         user,
-        text: LINES[Math.floor(random() * LINES.length)]!,
+        text: LINES[Math.floor(random() * LINES.length)]!.replace("{name}", (this.options.characterName ?? "bot").toLowerCase()),
         ts: Date.now(),
         badges: { sub: random() < 0.3 },
         firstMessage: this.sent <= 2,

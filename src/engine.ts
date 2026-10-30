@@ -52,9 +52,9 @@ export function createBrain(config: Config, character: Character): Brain {
   );
 }
 
-export function createSources(config: Config, demo: boolean): ChatSource[] {
+export function createSources(config: Config, character: Character, demo: boolean): ChatSource[] {
   const sources: ChatSource[] = [];
-  if (demo) sources.push(new DemoChat());
+  if (demo) sources.push(new DemoChat({ characterName: character.name }));
   if (config.twitchChannel) sources.push(new TwitchChat(config.twitchChannel));
   if (config.youtube.videoId) {
     sources.push(
@@ -91,7 +91,7 @@ export async function startEngine(config: Config, options: EngineOptions = {}): 
     idleChatter: options.idleChatter,
     timing: options.timing,
   });
-  const sources = options.sources ?? createSources(config, options.demo ?? false);
+  const sources = options.sources ?? createSources(config, character, options.demo ?? false);
   const server = await startServer({
     character,
     director,
@@ -100,6 +100,7 @@ export async function startEngine(config: Config, options: EngineOptions = {}): 
     dataDir: config.dataDir,
     webDir: path.join(config.rootDir, "web"),
     assetsDir: path.join(config.rootDir, "assets"),
+    modulesDir: path.join(config.rootDir, "node_modules"),
     host: config.host,
     port: config.port,
     ingestToken: config.ingestToken,

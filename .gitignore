@@ -12,3 +12,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+
+# Third-party Live2D runtime and sample models, downloaded by npm run setup:live2d (licensed by Live2D Inc.)
+assets/live2d/

@@ -2,20 +2,21 @@
 
 A live, chat-driven AI VTuber you can stream with. It reads Twitch and YouTube chat, picks what to answer, replies in character with Claude, speaks with a TTS voice, animates an avatar in OBS, and logs every moment so you can turn the best ones into vertical Shorts with one command.
 
-It ships with **Crumb**, an AI toaster that roasts whatever chat puts in its slots. Use it as is, or swap in your own character and art.
+It ships with two characters:
 
-![Crumb live, mid-roast](docs/img/avatar-live.png)
+- **Kiko** (the default): an anime-style AI girl who escaped customer support and now hands out verdicts (Approved, Patched, Deprecated, Deleted) on whatever chat sends her. She's a Live2D model with lip sync, 8 emotions, blinking, idle animation and hair physics. Her body is Live2D's free sample model Hiyori, a stand-in until you commission your own. It needs a one-time download (see [Avatars](#avatars)).
+- **Crumb**: an AI toaster mascot drawn in SVG, with nothing to download. It's also what the avatar page falls back to if a Live2D model fails to load.
 
 ## What's in the box
 
 - **Brain**: Claude replies in character, from a persona file you write in plain YAML. Replies come back as structured JSON (what to say plus which expression to show), the persona prompt is cached, and long-term memory remembers regulars and running bits between streams.
 - **Safety rails**: chat is screened before the AI sees it (slurs, profanity, prompt injection, links, personal info, spam). Messages that look like a viewer in crisis are never answered by the AI and raise an alert in your console. Replies are screened again before they're spoken. You also get a kill switch, a skip button and an optional review mode where you approve every line.
 - **Voice**: ElevenLabs, any OpenAI-compatible speech API (including free local [Kokoro](https://github.com/remsky/Kokoro-FastAPI)), or an offline "babble" voice for testing.
-- **Avatar**: a browser source for OBS with lip sync from the real audio, blinking, eye movement, 8 expressions and captions. Crumb is pure SVG. PNGtuber art (mouth open/closed per emotion) works too.
+- **Avatar**: a browser source for OBS with lip sync from the real audio, 8 expressions, blinking and captions. It supports Live2D anime models (the standard VTuber format), PNGtuber art (mouth open/closed per emotion), or the built-in SVG mascot.
 - **Operator console**: live chat with safety verdicts, the queue of what gets answered next, push-to-talk so you can talk to your character on stream, expression buttons, clip markers and a running cost estimate.
 - **Shorts studio**: renders 1080×1920 MP4s with the avatar, the chat question, karaoke captions and an end card. It works from saved stream moments (no API calls) or from a topic Claude scripts for you.
 
-![A rendered Short](docs/img/short-strip.jpg)
+![Crumb in a rendered Short](docs/img/short-strip.jpg)
 
 ## Quick start
 
@@ -23,6 +24,7 @@ You need [Node.js 22+](https://nodejs.org) and, for Shorts, [ffmpeg](https://ffm
 
 ```bash
 npm install
+npm run setup:live2d              # shows Live2D's terms; add -- --accept to download Kiko's model
 npx playwright install chromium   # only needed for Shorts
 cp .env.example .env              # optional: works offline without it
 npm run doctor                    # checks your setup
@@ -58,15 +60,41 @@ npm run short -- --topic "tabs vs spaces"   # Claude writes a fresh script, then
 npm run short -- --say "Rated: Charcoal." --question "roast my code"
 ```
 
-Videos land in `out/shorts/`, each with a `.txt` holding a suggested caption and hashtags. Rendering takes roughly 2× the video length. Watch every Short before you post it.
+Videos land in `out/shorts/`, each with a `.txt` holding a suggested caption and hashtags. Rendering takes roughly 2–5× the video length, with Live2D at the slow end on machines without a GPU. Watch every Short before you post it.
 
 Each clip entry in `data/sessions/<date>/session.jsonl` includes `offsetMs`, the time since the engine started, so you can also find the moment in your VOD.
 
 ## Make your own character
 
-Copy `characters/crumb.yaml`, edit it, and point `CHARACTER_FILE` at it. Everything in that file shapes the persona: identity, personality, how it talks, catchphrases, recurring bits, lore, hard boundaries, idle topics for dead air, and fallback lines.
+Copy `characters/kiko.yaml` (or `crumb.yaml`), edit it, and point `CHARACTER_FILE` at it. Everything in that file shapes the persona: identity, personality, how it talks, catchphrases, recurring bits, lore, hard boundaries, idle topics for dead air, and fallback lines.
 
-For your own art, use a PNG avatar:
+## Avatars
+
+### Live2D (Kiko's format)
+
+`npm run setup:live2d -- --accept` downloads Live2D's official sample model Hiyori (from Live2D's GitHub) and the Cubism Core runtime (from Live2D's site) into `assets/live2d/`. Those files are git-ignored: Live2D licenses them, not this project. The terms in short:
+
+- Individuals and businesses with annual sales under ¥10 million may use the sample models, including commercially. Larger businesses may not.
+- The sample characters' designs may not be changed.
+- Read the [Free Material License](https://www.live2d.com/eula/live2d-free-material-license-agreement_en.html), the [sample data terms](https://www.live2d.com/eula/live2d-sample-model-terms_en.html) and the [Cubism Core license](https://www.live2d.com/eula/live2d-proprietary-software-license-agreement_en.html) before you stream with them.
+
+A sample model is fine for launching and testing formats. It isn't unique, though: plenty of AI VTuber demos use Hiyori. For a channel you want to grow, commission your own Live2D model (art plus rigging). Then point the character file at it:
+
+```yaml
+avatar:
+  type: live2d
+  model: /assets/my-model/MyModel.model3.json   # put the exported model in assets/my-model/
+  zoom: 2.8          # 1 fits the whole model in frame; higher zooms in
+  focusY: 0.24       # which height of the model (0 = top, 1 = bottom) sits mid-frame
+  lipSyncParam: ParamMouthOpenY
+  expressions:       # optional: map emotions to expressions your rigger made
+    happy: Smile
+    angry: Angry
+```
+
+Emotions also drive Live2D's standard face parameters (eye smile, mouth form, cheeks, brows, gaze), so any model rigged on the standard template emotes even without expression files. In OBS, keep **Use hardware acceleration in browser sources** on (it's the default).
+
+### PNGtuber art
 
 ```yaml
 avatar:
@@ -79,6 +107,12 @@ avatar:
 ```
 
 Emotions: `neutral`, `happy`, `excited`, `smug`, `surprised`, `angry`, `sad`, `embarrassed`.
+
+### The built-in mascot
+
+`CHARACTER_FILE=characters/crumb.yaml` runs Crumb, which is pure SVG and needs no downloads.
+
+![Crumb live, mid-roast](docs/img/avatar-live.png)
 
 ## Hook it up to other tools
 
@@ -95,7 +129,8 @@ TTS is usually the bigger bill on a busy stream. Check your provider's pricing, 
 ## Project layout
 
 ```
-characters/      persona files (YAML)
+characters/      persona files (YAML): kiko.yaml (default), crumb.yaml
+assets/          your avatar art; assets/live2d/ holds the downloaded Live2D files
 src/brain/       Claude + offline mock, prompts, budget guard
 src/chat/        Twitch IRC, YouTube Live, demo audience
 src/voice/       ElevenLabs, OpenAI-compatible, babble, WAV helpers
@@ -104,7 +139,8 @@ src/safety.ts    input/output screening
 src/memory.ts    viewers and running bits across streams
 src/server.ts    HTTP + WebSocket for the avatar, console and integrations
 src/studio/      Shorts renderer (audio timeline + Playwright frames + ffmpeg)
-web/             avatar, console and Short pages (plain HTML/JS, no build step)
+src/live2d.ts    Live2D setup helpers (npm run setup:live2d)
+web/             avatar, console and Short pages (plain HTML/JS, no build step); web/js/live2d.js draws Live2D
 test/            unit + integration tests; test/e2e/ runs real Chromium and ffmpeg
 ```
 
@@ -112,6 +148,7 @@ test/            unit + integration tests; test/e2e/ runs real Chromium and ffmp
 
 ```bash
 npm test           # unit + integration (no network, no browser)
-npm run test:e2e   # real Chromium + ffmpeg: live avatar playback, console, a rendered Short
+npm run test:e2e   # real Chromium + ffmpeg: live avatar playback, console, rendered Shorts
+                   # (the Live2D ones skip until you've run setup:live2d)
 npm run typecheck
 ```

@@ -93,6 +93,13 @@ html, body {
   justify-content: center;
 }
 
+.stage.live2d {
+  top: 600px;
+  left: 0;
+  width: 1080px;
+  height: 1320px;
+}
+
 .stage .avatar-svg {
   width: 1000px;
   height: 1000px;
@@ -136,11 +143,19 @@ html, body {
   left: 0;
   right: 0;
   bottom: 70px;
-  color: rgba(255, 255, 255, 0.85);
+  color: #fff;
   font-size: 40px;
   font-weight: 800;
   text-align: center;
+  -webkit-text-stroke: 8px var(--ink);
+  paint-order: stroke fill;
 }
+
+/* The avatar sits behind the text layers. */
+.stage { z-index: 1; }
+.title, .question { z-index: 2; }
+.caption, .footer { z-index: 3; }
+.endcard { z-index: 5; }
 
 .endcard {
   position: absolute;

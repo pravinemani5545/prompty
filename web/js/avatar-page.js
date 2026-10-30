@@ -1,4 +1,4 @@
-import { createAvatar, findRating } from "./avatar.js";
+import { FALLBACK_AVATAR, createAvatar, findRating } from "./avatar.js";
 import { VoicePlayer, syntheticLevel } from "./audio.js";
 import { Bus } from "./bus.js";
 import { LiveCaptions } from "./captions.js";
@@ -11,8 +11,21 @@ if (preview) document.body.classList.add("preview");
 
 const character = await (await fetch("/api/character")).json();
 document.documentElement.style.setProperty("--accent", character.avatar.accentColor || "#7cf7ff");
+// Live2D models run to the bottom edge, with captions over the torso, instead of stopping above them.
+document.body.classList.toggle("live2d", character.avatar.type === "live2d");
 
-const avatar = createAvatar(document.getElementById("stage"), character.avatar);
+let avatar;
+try {
+  avatar = await createAvatar(document.getElementById("stage"), character.avatar);
+} catch (error) {
+  const problem = document.getElementById("problem");
+  problem.hidden = false;
+  problem.textContent =
+    character.avatar.type === "live2d"
+      ? `Live2D model didn't load (${error.message}). Run: npm run setup:live2d -- --accept`
+      : `Avatar didn't load: ${error.message}`;
+  avatar = await createAvatar(document.getElementById("stage"), { ...FALLBACK_AVATAR, label: character.name.toUpperCase() });
+}
 const captions = params.get("captions") === "0" ? null : new LiveCaptions(document.getElementById("captions"), character.name);
 const player = new VoicePlayer();
 player.muted = preview;

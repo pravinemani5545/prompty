@@ -42,6 +42,26 @@ body.preview {
   transform-origin: 50% 100%;
 }
 
+.avatar-live2d {
+  display: block;
+}
+
+body.live2d .stage {
+  inset: 0;
+}
+
+.problem {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(120, 20, 30, 0.92);
+  color: #fff;
+  font: 700 15px/1.35 var(--font);
+}
+
 .captions {
   position: absolute;
   left: 4%;

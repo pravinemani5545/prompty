@@ -70,7 +70,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env, rootDir = ROOT_
     effortLive: oneOf(str(env, "CLAUDE_EFFORT_LIVE"), efforts, "low", "CLAUDE_EFFORT_LIVE"),
     effortScripts: oneOf(str(env, "CLAUDE_EFFORT_SCRIPTS"), efforts, "medium", "CLAUDE_EFFORT_SCRIPTS"),
     dailyBudgetUsd: num(str(env, "DAILY_BUDGET_USD"), 10, "DAILY_BUDGET_USD"),
-    characterFile: path.resolve(rootDir, str(env, "CHARACTER_FILE") ?? "characters/crumb.yaml"),
+    characterFile: path.resolve(rootDir, str(env, "CHARACTER_FILE") ?? "characters/kiko.yaml"),
     tts: {
       provider: oneOf<TtsProvider>(str(env, "TTS_PROVIDER"), ["babble", "elevenlabs", "openai", "none"], "babble", "TTS_PROVIDER"),
       elevenlabs: {

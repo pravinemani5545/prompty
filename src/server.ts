@@ -51,7 +51,15 @@ export function serveFile(res: http.ServerResponse, dir: string, relative: strin
 export interface StaticMounts {
   webDir: string;
   assetsDir: string;
+  /** node_modules, for the few browser builds listed in VENDOR. */
+  modulesDir: string;
 }
+
+/** Browser builds the avatar pages load from /vendor/<name>. Nothing else in node_modules is exposed. */
+const VENDOR: Record<string, string> = {
+  "pixi.min.js": "pixi.js/dist/pixi.min.js",
+  "live2d-cubism4.min.js": "pixi-live2d-display-lipsyncpatch/dist/cubism4.min.js",
+};
 
 /** Routes shared by the live server and the Shorts renderer: pages, scripts and assets. */
 export function serveStatic(req: http.IncomingMessage, res: http.ServerResponse, mounts: StaticMounts): boolean {
@@ -66,6 +74,8 @@ export function serveStatic(req: http.IncomingMessage, res: http.ServerResponse,
   if (page) return serveFile(res, mounts.webDir, page);
   if (url.pathname.startsWith("/web/")) return serveFile(res, mounts.webDir, url.pathname.slice("/web/".length));
   if (url.pathname.startsWith("/assets/")) return serveFile(res, mounts.assetsDir, url.pathname.slice("/assets/".length));
+  const vendored = url.pathname.startsWith("/vendor/") ? VENDOR[url.pathname.slice("/vendor/".length)] : undefined;
+  if (vendored) return serveFile(res, mounts.modulesDir, vendored);
   return false;
 }
 

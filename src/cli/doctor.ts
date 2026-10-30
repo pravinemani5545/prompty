@@ -6,6 +6,7 @@ import { chromium } from "playwright";
 import { loadCharacter } from "../character.js";
 import { loadConfig, loadDotEnv } from "../config.js";
 import { createBrain } from "../engine.js";
+import { missingLive2dFiles } from "../live2d.js";
 import { errorMessage } from "../log.js";
 import { createVoice } from "../voice/voices.js";
 
@@ -40,6 +41,17 @@ async function main(): Promise<void> {
   try {
     character = loadCharacter(config.characterFile);
     report("ok", "Character", `${character.name} (${path.relative(config.rootDir, config.characterFile)})`);
+    const avatar = character.avatar;
+    if (avatar.type === "live2d") {
+      const missing = missingLive2dFiles(config.rootDir, avatar);
+      report(
+        missing.length === 0 ? "ok" : "fail",
+        "Avatar",
+        missing.length === 0 ? `Live2D model found (${avatar.model})` : `Live2D files missing (${missing.join(", ")}). Run: npm run setup:live2d -- --accept`,
+      );
+    } else {
+      report("ok", "Avatar", avatar.type);
+    }
   } catch (error) {
     report("fail", "Character", errorMessage(error));
   }
