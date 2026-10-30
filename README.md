@@ -40,7 +40,7 @@ With no keys, the brain is an offline mock that uses canned lines and the voice 
 
 1. **Real brain**: put `ANTHROPIC_API_KEY` in `.env`, then run `npm run doctor -- --ping` to get one test reply. The default model is `claude-opus-5-5` (set `CLAUDE_MODEL` to change it). Live replies run at `low` effort so they come back fast. If a request is declined by a safety classifier, Anthropic's server-side fallback retries it on another model, so a false positive doesn't leave dead air.
 2. **Real voice**: set `TTS_PROVIDER=elevenlabs` with `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID`, or `TTS_PROVIDER=openai` for OpenAI or a local Kokoro server.
-3. **Chat**: set `TWITCH_CHANNEL=yourchannel`. This is read-only and needs no login. For YouTube, set `YOUTUBE_LIVE_VIDEO_ID` and `YOUTUBE_API_KEY`. Each poll costs API quota, so leave `YOUTUBE_MIN_POLL_SECONDS` at 8 or more.
+3. **Chat**: set `TWITCH_CHANNEL=yourchannel`. This is read-only and needs no login. For YouTube, set `YOUTUBE_LIVE_VIDEO_ID` and `YOUTUBE_API_KEY`. Each poll costs API quota, so leave `YOUTUBE_MIN_POLL_SECONDS` at 8 or more. If YouTube rejects the key for live chat, put an OAuth access token in `YOUTUBE_OAUTH_TOKEN` instead, or relay chat through Social Stream Ninja (see below).
 4. **OBS**: add a **Browser** source with URL `http://127.0.0.1:4870/avatar`, size 1080×1080, and tick **Control audio via OBS**. Add `?captions=0` to the URL to hide captions, or `?question=0` to hide the chat question.
 5. `npm start`, then open the console.
 
