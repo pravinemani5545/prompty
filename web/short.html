@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Short renderer</title>
+  <link rel="stylesheet" href="/web/css/short.css">
+</head>
+<body>
+  <!-- Rendered frame by frame by `npm run short`. Not meant to be opened by hand. -->
+  <div class="frame">
+    <div class="bg"></div>
+    <h1 class="title" id="title"></h1>
+    <div class="question" id="question" hidden>
+      <div class="q-user" id="q-user"></div>
+      <div class="q-text" id="q-text"></div>
+    </div>
+    <div class="stage" id="stage"></div>
+    <div class="caption" id="caption"></div>
+    <div class="footer" id="footer"></div>
+    <div class="endcard" id="endcard">
+      <div class="end-1" id="end-1"></div>
+      <div class="end-2" id="end-2"></div>
+      <div class="end-3" id="end-3"></div>
+    </div>
+  </div>
+  <script type="module" src="/web/js/short-page.js"></script>
+</body>
+</html>

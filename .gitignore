@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.local
+
+# Runtime output: session logs, TTS audio, memory, rendered shorts
+data/
+out/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

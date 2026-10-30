@@ -1,0 +1,124 @@
+:root {
+  --accent: #7cf7ff;
+  --panel: rgba(20, 26, 51, 0.88);
+  --text: #f4f7ff;
+  --muted: #b9c2e6;
+  --twitch: #a970ff;
+  --youtube: #ff4e45;
+  --font: "Nunito", "Segoe UI", "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  /* Transparent so OBS composites the avatar over your scene. */
+  background: transparent;
+  font-family: var(--font);
+}
+
+body.preview {
+  background: #2b2f45;
+}
+
+.stage {
+  position: absolute;
+  inset: 0 0 22% 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.avatar-svg {
+  width: min(100%, 100vh);
+  height: auto;
+  max-height: 100%;
+  overflow: visible;
+}
+
+.avatar-png {
+  max-width: 90%;
+  max-height: 100%;
+  transform-origin: 50% 100%;
+}
+
+.captions {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 3%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.captions.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.cap-question {
+  align-self: flex-start;
+  max-width: 85%;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1d2238;
+  font-size: clamp(14px, 2.4vw, 28px);
+  line-height: 1.25;
+}
+
+.cap-user {
+  font-weight: 800;
+  margin-right: 8px;
+  color: #5a3fd1;
+}
+
+.cap-question[data-platform="twitch"] .cap-user { color: #7a3ff2; }
+.cap-question[data-platform="youtube"] .cap-user { color: #d92d26; }
+
+.cap-line {
+  padding: 14px 20px;
+  border-radius: 18px;
+  background: var(--panel);
+  border: 3px solid var(--accent);
+  color: var(--text);
+  font-size: clamp(18px, 3.4vw, 40px);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.cap-name {
+  display: block;
+  font-size: 0.55em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+.cap-text .w {
+  opacity: 0.18;
+  transition: opacity 0.08s linear;
+}
+
+.cap-text .w.on {
+  opacity: 1;
+}
+
+.unlock {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #141a33;
+  font: 800 16px var(--font);
+  cursor: pointer;
+}

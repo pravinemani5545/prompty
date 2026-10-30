@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stream Console</title>
+  <link rel="stylesheet" href="/web/css/console.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="dot" id="link-dot" title="engine connection"></span>
+      <strong id="char-name">…</strong>
+      <span class="pill" id="phase">idle</span>
+    </div>
+    <div class="meta">
+      <span id="brain"></span>
+      <span id="voice"></span>
+      <span id="spend" title="Estimated from token usage. Check your Anthropic console for real numbers."></span>
+      <span id="sources"></span>
+    </div>
+  </header>
+
+  <div id="alerts" class="alerts"></div>
+
+  <main class="grid">
+    <section class="col controls">
+      <button id="pause" class="kill" title="Esc">Pause</button>
+      <div class="row">
+        <button id="skip" title="Alt+S">Skip</button>
+        <button id="clip" title="Alt+C">Mark clip</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="idle"> Idle chatter when chat is quiet</label>
+      <label class="toggle"><input type="checkbox" id="review"> Review mode (approve every reply)</label>
+
+      <h2>Talk to <span class="cname">it</span></h2>
+      <textarea id="handler-text" rows="3" placeholder="Say something to the character… (Ctrl+Enter)"></textarea>
+      <div class="row">
+        <button id="ask" class="primary">Ask</button>
+        <button id="say" title="Speak this exact line, no AI">Say exactly</button>
+      </div>
+      <button id="ptt" class="ptt">Hold to talk</button>
+      <p class="hint" id="ptt-hint"></p>
+
+      <h2>Expression</h2>
+      <div class="emotions" id="emotions"></div>
+
+      <h2>Test chat</h2>
+      <div class="row">
+        <input id="test-user" value="tester" aria-label="username">
+      </div>
+      <div class="row">
+        <input id="test-text" placeholder="message as a viewer" aria-label="message">
+        <button id="test-send">Send</button>
+      </div>
+
+      <h2>Preview</h2>
+      <iframe class="preview" src="/avatar?preview=1&captions=0" title="avatar preview"></iframe>
+    </section>
+
+    <section class="col feed">
+      <h2>Chat</h2>
+      <ol id="chat" class="chat"></ol>
+    </section>
+
+    <section class="col side">
+      <div id="pending" class="pending" hidden>
+        <h2>Waiting for approval</h2>
+        <p class="pending-to"></p>
+        <p class="pending-text"></p>
+        <div class="row">
+          <button id="approve" class="primary" title="Alt+A">Approve</button>
+          <button id="reject" title="Alt+R">Reject</button>
+        </div>
+      </div>
+      <h2>Up next</h2>
+      <ol id="queue" class="queue"></ol>
+      <h2>On air <span class="hint">(★ = make a Short later)</span></h2>
+      <ol id="exchanges" class="exchanges"></ol>
+      <details class="logs">
+        <summary>Logs</summary>
+        <ol id="logs"></ol>
+      </details>
+    </section>
+  </main>
+  <script type="module" src="/web/js/console.js"></script>
+</body>
+</html>
